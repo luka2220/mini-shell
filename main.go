@@ -22,6 +22,8 @@ var (
 func main() {
 	fmt.Print("Mini-shell\n- To executre a command enter it in the prompt\n- To quit enter 'exit' or press ctrl+c\n\n")
 
+	fmt.Println("Testing some changes.....")
+
 	read()
 }
 
