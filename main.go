@@ -3,12 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
-)
-
-var (
-	logger = log.New(os.Stdout, "[OUT]: ", log.Llongfile)
 )
 
 /*
@@ -18,6 +13,20 @@ var (
 	Piping: Implement simple piping (|) between commands.
 	Error Handling: Gracefully handle invalid commands or incorrect syntax.
 */
+
+var (
+	commands = map[string]commandOperation{
+		"ls": lsCmdOp,
+	}
+)
+
+type commandOperation func(string) string
+
+func lsCmdOp(string) string {
+	fmt.Printf("ls command running...\n")
+
+	return "ls command runnning"
+}
 
 func main() {
 	fmt.Print("Mini-shell\n- To executre a command enter it in the prompt\n- To quit enter 'exit' or press ctrl+c\n\n")
@@ -35,9 +44,12 @@ func read() {
 
 		cmd, err := buffer.ReadString('\n')
 		if err != nil {
-			logger.Printf("Error reading command: %v\n", err)
+			fmt.Printf("Error reading command: %v\n", err)
 			continue
 		}
+
+		// Remove \n from cmd
+		cmd = cmd[:len(cmd)-1]
 
 		if len(cmd) > 64 {
 			fmt.Println("Too long, the command has a max size of 64")
@@ -45,10 +57,14 @@ func read() {
 		}
 
 		switch cmd {
-		case "exit\n":
+		case "exit":
 			os.Exit(1)
 		default:
-			fmt.Printf("%s is an unrecognized command...\n", cmd[:len(cmd)-1])
+			if op, in := commands[cmd]; in {
+				op(cmd)
+				continue
+			}
+			fmt.Printf("%s is an unrecognized command...\n", cmd)
 		}
 	}
 }
